@@ -1,0 +1,105 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[47]:
+
+
+from flair.data import Corpus
+from flair.datasets import ColumnCorpus
+import flair
+import torch
+#flair.device = torch.device('cuda:0')
+
+def  run():
+    # define columns
+    columns = {0: 'text', 1: 'pos', 2: 'ner'}
+
+    # this is the folder in which train, test and dev files reside
+    data_folder = 'data/itr5'
+
+    # init a corpus using column format, data folder and the names of the train, dev and test files
+    corpus: Corpus = ColumnCorpus(data_folder, columns,
+                                  train_file='train.txt',
+                                  test_file='test.txt',
+                                  dev_file='test.txt')
+
+
+    # In[48]:
+
+
+    len(corpus.train)
+
+    # In[49]:
+
+
+    print(corpus.train[1].to_tagged_string('pos'))
+    print(corpus.train[1].to_tagged_string('ner'))
+
+
+    # In[ ]:
+
+
+    from flair.data import Corpus
+    from flair.datasets import WIKINER_ENGLISH
+    from flair.embeddings import TokenEmbeddings, WordEmbeddings, StackedEmbeddings, FlairEmbeddings
+    from typing import List
+    from flair.embeddings import ELMoEmbeddings, CharacterEmbeddings
+    from flair.embeddings import BytePairEmbeddings
+    from flair.embeddings import BertEmbeddings
+
+
+    # 1. get the corpus
+    print(corpus)
+
+    # 2. what tag do we want to predict?
+    tag_type = 'ner'
+
+    # 3. make the tag dictionary from the corpus
+    tag_dictionary = corpus.make_tag_dictionary(tag_type=tag_type)
+    print(tag_dictionary.idx2item)
+
+    
+    # 4. initialize embeddings
+    embedding_types: List[TokenEmbeddings] = [
+#       BertEmbeddings()
+     #    WordEmbeddings('glove'),
+#       ELMoEmbeddings('original')
+        # comment in this line to use character embeddings
+      #   CharacterEmbeddings(),
+        # BytePairEmbeddings('en', dim=200),
+
+         BytePairEmbeddings('en', dim=300),
+
+
+        # comment in these lines to use flair embeddings
+        #FlairEmbeddings('news-forward'),
+        #FlairEmbeddings('news-backward'),
+    ]
+
+    embeddings: StackedEmbeddings = StackedEmbeddings(embeddings=embedding_types)
+
+    # 5. initialize sequence tagger
+    from flair.models import SequenceTagger
+
+    tagger: SequenceTagger = SequenceTagger(hidden_size=256,
+                                            embeddings=embeddings,
+                                            tag_dictionary=tag_dictionary,
+                                            tag_type=tag_type,
+
+
+
+    # 6. initialize trainer
+    from flair.trainers import ModelTrainer
+
+    trainer: ModelTrainer = ModelTrainer(tagger, corpus)
+
+    # 7. start training
+    trainer.train('models/itr5',
+                  learning_rate=0.3,
+                  mini_batch_size=16,
+                  max_epochs=150, checkpoint=True)
+
+if __name__ == '__main__':
+    run()
+    # A zero exit code causes the job to be marked a Succeeded.
+    sys.exit(0)

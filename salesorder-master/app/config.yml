@@ -1,0 +1,11 @@
+AWS:
+  SM:
+    endpoint: ML_SALESORDERFLAIRV1
+    region: us-east-1
+    service: runtime.sagemaker
+
+app:
+  secret_key: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1Ni
+  login_user: admin
+  login_pwd: password
+  content_type: application/json
