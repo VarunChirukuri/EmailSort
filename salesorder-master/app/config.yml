@@ -5,7 +5,7 @@ AWS:
     service: runtime.sagemaker
 
 app:
-  secret_key: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1Ni
+  secret_key: trdrcghbcdrttvghb
   login_user: admin
   login_pwd: password
   content_type: application/json
